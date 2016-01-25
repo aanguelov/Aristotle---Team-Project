@@ -166,13 +166,41 @@ for ( var i = 0; i < 50; i ++ ) {
 
 }
 
-var circleGeometry = new THREE.CircleGeometry(5, 32);
+var circleGeometry = new THREE.CircleGeometry(0.05, 32);
 //Load Circle pic:
 var circle = new THREE.Mesh(circleGeometry, new THREE.MeshBasicMaterial( {map:THREE.ImageUtils.loadTexture('resources/target.png')}));
-circle.position.z -= 50;
-circle.position.y += 10;
+
+circle.position.copy( camera.position );
+circle.rotation.copy( camera.rotation );
+circle.updateMatrix();
+circle.translateZ( - 1 );
+
 console.log(circle.position);
 scene.add(circle);
+
+var targetImages = [];
+var targetGeometry = new THREE.SphereGeometry(5, 30, 30);
+var targetImageBogi = new THREE.MeshBasicMaterial( {map:THREE.ImageUtils.loadTexture('resources/bogomil.jpg')});
+var targetImageBankin = new THREE.MeshBasicMaterial( {map:THREE.ImageUtils.loadTexture('resources/bankin.jpg')});
+var targetImageNakov = new THREE.MeshBasicMaterial( {map:THREE.ImageUtils.loadTexture('resources/nakov.jpg')});
+targetImages.push(targetImageBankin);
+targetImages.push(targetImageBogi);
+targetImages.push(targetImageNakov);
+
+// creates enemies with random images at random places at the scene at every 5 seconds
+function createEnemy() {
+    var imagePicker = Math.floor(Math.random() * 3);
+    var image = targetImages[imagePicker];
+    var enemy = new THREE.Mesh(targetGeometry, image);
+
+    enemy.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
+    enemy.position.y = Math.floor( Math.random() * 20 ) * 20 + 10;
+    enemy.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
+
+    scene.add(enemy);
+}
+
+setInterval(createEnemy, 5000);
 
 var circleControls = new THREE.CircleControls(circle);
 scene.add(circleControls.getObject());
