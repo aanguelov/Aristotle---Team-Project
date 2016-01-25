@@ -167,7 +167,8 @@ for ( var i = 0; i < 50; i ++ ) {
 }
 
 var circleGeometry = new THREE.CircleGeometry(5, 32);
-var circle = new THREE.Mesh(circleGeometry, new THREE.MeshBasicMaterial( {color: 0x0000ff}));
+//Load Circle pic:
+var circle = new THREE.Mesh(circleGeometry, new THREE.MeshBasicMaterial( {map:THREE.ImageUtils.loadTexture('resources/target.png')}));
 circle.position.z -= 50;
 circle.position.y += 10;
 console.log(circle.position);

@@ -10,7 +10,7 @@ THREE.CircleControls = function ( camera ) {
 
 	var pitchObject = new THREE.Object3D();
 	pitchObject.add( camera );
-	console.log(pitchObject.position)
+	console.log(pitchObject.position);
 
 	var yawObject = new THREE.Object3D();
 	yawObject.position.y = 10;
