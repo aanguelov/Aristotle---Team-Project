@@ -258,6 +258,25 @@ function animate() {
 
     requestAnimationFrame(animate);
 
+    for(var i = 0; i< rays.length; i++)
+    {
+        raycaster.set(controls.getDirection,rays[i].normalize());
+        var collisions = raycaster.intersectObjects(objects);
+        if(collisions.length > 0 && collisions[0].distance <= 10)
+        {
+            console.log(collisions);
+            if ((i === 0 || i === 1 || i === 7) && moveForward) {
+                moveForward = false;
+            } else if ((i === 3 || i === 4 || i === 5) && moveBackward) {
+                moveBackward = false;
+            }
+            if ((i === 1 || i === 2 || i === 3) && moveRight) {
+                moveRight = false;
+            } else if ((i === 5 || i === 6 || i === 7) && moveLeft) {
+                moveLeft = false;
+            }
+        }
+    }
 
     raycaster.ray.origin.copy(controls.getObject().position);
     //raycaster.ray.origin.copy(circleControls.getObject().position);
