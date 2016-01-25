@@ -30,7 +30,7 @@ if ( havePointerLock ) {
         } else {
 
             controls.enabled = false;
-            circleControls.enabled = false
+            circleControls.enabled = false;
 
             blocker.style.display = '-webkit-box';
             blocker.style.display = '-moz-box';
