@@ -2,14 +2,17 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.PointerLockControls = function ( camera ) {
+THREE.PointerLockControls = function ( camera , circle) {
 
 	var scope = this;
 
 	camera.rotation.set( 0, 0, 0 );
+	
+	circle.rotation.set( 0, 0, 0);
 
 	var pitchObject = new THREE.Object3D();
 	pitchObject.add( camera );
+	pitchObject.add(circle);
 
 	var yawObject = new THREE.Object3D();
 	yawObject.position.y = 10;
@@ -67,14 +70,13 @@ THREE.PointerLockControls = function ( camera ) {
 
 		// assumes the camera itself is not rotated
 
-		var direction = new THREE.Vector3( 0, 0, - 1 );
 		var rotation = new THREE.Euler( 0, 0, 0, "YXZ" );
 
-		return function() {
+		return function(v) {
 			rotation.set( pitchObject.rotation.x, yawObject.rotation.y, 0 );
-			direction.applyEuler( rotation );
+			v.applyEuler( rotation );
 
-			return direction;
+			return v;
 		}
 
 	}();

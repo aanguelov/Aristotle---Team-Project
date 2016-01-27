@@ -1,10 +1,26 @@
 
 var camera, scene, renderer;
 var geometry, material, mesh;
-var controls, circleControls;
+var controls;
 var objects = [];
 var prev;
 var raycaster;
+var target;
+
+var sideRays = [
+    new THREE.Vector3(0, 0, -1),
+    new THREE.Vector3(1, 0, 0),
+    new THREE.Vector3(0, 0, 1),
+    new THREE.Vector3(-1, 0, 0),
+];
+
+var botRay =  new THREE.Vector3(0, -1, 0);
+var topRay = new THREE.Vector3(0, 1, 0);
+
+var speed = 30;
+
+var prevTime = performance.now();
+var velocity = new THREE.Vector3();
 
 var blocker = document.getElementById( 'blocker' );
 var instructions = document.getElementById( 'instructions' );
@@ -23,14 +39,14 @@ if ( havePointerLock ) {
 
             controlsEnabled = true;
             controls.enabled = true;
-            circleControls.enabled = true;
+
 
             blocker.style.display = 'none';
 
         } else {
 
             controls.enabled = false;
-            circleControls.enabled = false;
+
 
             blocker.style.display = '-webkit-box';
             blocker.style.display = '-moz-box';
@@ -113,22 +129,7 @@ var blockedForward = false;
 var blockedBackward = false;
 var blockedLeft = false;
 var blockedRight = false;
-var target;
 
-var sideRays = [
-    new THREE.Vector3(0, 0, -1),
-    new THREE.Vector3(1, 0, 0),
-    new THREE.Vector3(0, 0, 1),
-    new THREE.Vector3(-1, 0, 0),
-];
-
-var botRay =  new THREE.Vector3(0, -1, 0);
-var topRay = new THREE.Vector3(0, 1, 0);
-
-var speed = 30;
-
-var prevTime = performance.now();
-var velocity = new THREE.Vector3();
 
 
 function init() {
@@ -142,9 +143,7 @@ function init() {
     light.position.set( 0.5, 1, 0.75 );
     scene.add( light );
 
-    controls = new THREE.PointerLockControls( camera);
-    scene.add( controls.getObject() );
-
+ 
     // crosshair
     var circleGeometry = new THREE.CircleGeometry(0.05, 32);
     //Load Circle pic:
@@ -155,10 +154,10 @@ function init() {
     crosshair.updateMatrix();
     crosshair.translateZ( - 2 );
 
-    scene.add(crosshair);
 
-    circleControls = new THREE.CircleControls(crosshair);
-    scene.add(circleControls.getObject());
+	controls = new THREE.PointerLockControls( camera, crosshair);
+    scene.add( controls.getObject() );
+
 
     var onKeyDown = function ( event ) {
 
@@ -231,7 +230,7 @@ function init() {
     document.addEventListener( 'keydown', onKeyDown, false );
     document.addEventListener( 'keyup', onKeyUp, false );
 
-    raycaster = new THREE.Raycaster(new THREE.Vector3(),new THREE.Vector3(0,0,-1),0,20);
+    raycaster = new THREE.Raycaster(new THREE.Vector3(),new THREE.Vector3(0,0,-1),0,1000);
 
     // floor
 
@@ -284,7 +283,7 @@ function onWindowResize() {
 
 }
 
-function CollisionCheck() {
+function collisionCheck() {
 
     if ( controlsEnabled ) {
 
@@ -333,9 +332,8 @@ function CollisionCheck() {
 
         //bot collision
         raycaster.set(controls.getObject().position,botRay);
-        raycaster.set(circleControls.getObject().position,botRay);
         collisions = raycaster.intersectObjects(objects);
-        if(collisions.length > 0) {
+        if(collisions.length > 0 && collisions[0].distance <=20) {
 
             velocity.y = Math.max(0, velocity.y);
             canJump = true;
@@ -343,7 +341,6 @@ function CollisionCheck() {
 
         //top collision
         raycaster.set(controls.getObject().position,topRay);
-        raycaster.set(circleControls.getObject().position,topRay);
         collisions = raycaster.intersectObjects(objects);
         if(collisions.length > 0 && collisions[0].distance <= 5) {
 
@@ -365,17 +362,14 @@ function CollisionCheck() {
         controls.getObject().translateX( velocity.x * delta );
         controls.getObject().translateY( velocity.y * delta );
         controls.getObject().translateZ( velocity.z * delta );
-        console.log(controls.getObject().position.y - circleControls.getObject().position.y);
-        //console.log(circleControls.getObject().position);
-        circleControls.getObject().translateX( velocity.x * delta );
-        circleControls.getObject().translateY( velocity.y * delta );
-        circleControls.getObject().translateZ( velocity.z * delta );
+
+    
+
 
         // ground check
         if ( controls.getObject().position.y < 10 ) {
             velocity.y = 0;
             controls.getObject().position.y = 10;
-            circleControls.getObject().position.y = 10;
             canJump = true;
         }
 
@@ -385,31 +379,36 @@ function CollisionCheck() {
     }
 }
 
-//function target() {
-//    raycaster.set(controls.getObject().position,controls.getDirection());
-//    var collisions = raycaster.intersectObjects(objects);
-//    if(collisions.length > 0)
-//    {
-//        if(target != collisions[0].object)
-//        {
-//            if(target) target.material.emissive.setHex(target.currentHex);
-//
-//            target = collisions[0].object;
-//            target.currentHex = target.material.emissive.getHex();
-//            target.material.emissive.setHex(0xff0000);
-//        }
-//    }
-//    else{
-//        if(target) target.material.emissive.setHex(target.currentHex);
-//
-//        target = null;
-//    }
-//}
+function targeting() {
+    raycaster.set(controls.getObject().position,controls.getDirection(sideRays[0].clone()));
+    var collisions = raycaster.intersectObjects(objects);
+    if(collisions.length > 0)
+    {
+        if(target != collisions[0].object)
+        {
+            if(target){
+                target.material.color.setHex(target.currentHex);
+            }
+
+            target = collisions[0].object;
+            target.currentHex = target.material.color.getHex();
+            target.material.color.setHex(0xff0000);
+        }
+    }
+    else{
+        if(target)
+        {
+            target.material.color.setHex(target.currentHex);
+        }
+
+        target = null;
+    }
+}
 
 
 function animate() {
     requestAnimationFrame( animate );
-    CollisionCheck();
-    //target();
+    collisionCheck();
+	targeting();
     renderer.render( scene, camera );
 }
