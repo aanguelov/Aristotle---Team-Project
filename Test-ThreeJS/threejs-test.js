@@ -180,7 +180,7 @@ for ( var i = 0; i < 50; i ++ ) {
 
 var circleGeometry = new THREE.CircleGeometry(0.05, 32);
 //Load Circle pic:
-var circle = new THREE.Mesh(circleGeometry, new THREE.MeshBasicMaterial( {map:THREE.ImageUtils.loadTexture('resources/target.png')}));
+var circle = new THREE.Mesh(circleGeometry, new THREE.MeshBasicMaterial( {transparent: true, opacity: 0.5, map:THREE.ImageUtils.loadTexture('resources/target.png')}));
 
 circle.position.copy( camera.position );
 circle.rotation.copy( camera.rotation );
