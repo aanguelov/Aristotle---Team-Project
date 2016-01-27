@@ -276,9 +276,18 @@ function init() {
 
 }
 
+function playSound() {
+    var audio = document.createElement('audio');
+    var source = document.createElement('source');
+    source.src = 'sounds/Bomb-SoundBible.com-891110113.mp3';
+    audio.appendChild(source);
+    audio.play();
+}
+
 function shoot() {
     objects.forEach(function(box){
        if (box.isTargeted) {
+           playSound();
            scene.remove(box);
            objects.splice(objects.indexOf(box), 1);
        } 
