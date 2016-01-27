@@ -21,10 +21,14 @@ var speed = 30;
 
 var prevTime = performance.now();
 var velocity = new THREE.Vector3();
+var bogi;
+var bankin;
+var id;
 
 var blocker = document.getElementById( 'blocker' );
 var instructions = document.getElementById( 'instructions' );
 
+var audio = document.createElement('audio');
 
 var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
 
@@ -143,6 +147,8 @@ function init() {
     light.position.set( 0.5, 1, 0.75 );
     scene.add( light );
 
+	//sounds
+    audio.src = 'sounds/Bomb-SoundBible.com-891110113.mp3';
  
     // crosshair
     var circleGeometry = new THREE.CircleGeometry(0.05, 32);
@@ -256,13 +262,31 @@ function init() {
 
         var mesh = new THREE.Mesh( geometry, material );
         mesh.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
-        mesh.position.y = Math.floor( Math.random() * 20 ) * 20 + 10;
+        mesh.position.y = Math.floor( Math.random() * 20 ) * 50 + 10;
         mesh.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
         scene.add( mesh );
 
         objects.push( mesh );
 
     }
+	
+	//EVIL BOSSES
+	var targetGeometry = new THREE.BoxGeometry(30, 30, 30);
+	var targetImageBogi = new THREE.MeshBasicMaterial( {map:THREE.ImageUtils.loadTexture('resources/bogomil.jpg')});
+	var targetImageBankin = new THREE.MeshBasicMaterial( {map:THREE.ImageUtils.loadTexture('resources/bankin.jpg')});
+	bogi = new THREE.Mesh(targetGeometry, targetImageBogi);
+	bankin = new THREE.Mesh(targetGeometry, targetImageBankin);
+	bogi.position.x = Math.floor( Math.random() * 25 ) * 20;
+    bogi.position.y = Math.floor( Math.random() * 20 ) + 1400;
+    bogi.position.z = Math.floor( Math.random() * 25 ) * 20;
+	bankin.position.x = Math.floor( Math.random() * 25 ) * 20;
+    bankin.position.y = Math.floor( Math.random() * 20 ) + 1400;
+    bankin.position.z = Math.floor( Math.random() * 25  ) * 20;
+	
+	scene.add(bogi);
+	scene.add(bankin);
+	objects.push(bogi);
+	objects.push(bankin);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor( 0xffffff );
@@ -277,17 +301,17 @@ function init() {
 }
 
 function playSound() {
-    var audio = document.createElement('audio');
-    var source = document.createElement('source');
-    source.src = 'sounds/Bomb-SoundBible.com-891110113.mp3';
-    audio.appendChild(source);
+	if(!audio.paused){
+		audio.pause;
+		audio.currentTime = 0;
+	}	
     audio.play();
 }
 
 function shoot() {
+	playSound();
     objects.forEach(function(box){
        if (box.isTargeted) {
-           playSound();
            scene.remove(box);
            objects.splice(objects.indexOf(box), 1);
        } 
@@ -429,10 +453,27 @@ function targeting() {
     }
 }
 
+function victory(){
+
+	if(objects.indexOf(bogi) === -1 && objects.indexOf(bankin) === -1)
+	{
+	var img = document.createElement('img');
+	img.style.position = 'absolute';
+	img.src = 'resources/freedom.jpg';
+	img.style.borderRadius = "5px";
+	img.style.left = window.innerWidth/2 - 400 + "px";
+	img.style.top = window.innerHeight/2 - 200 + "px";
+	document.body.appendChild(img);
+	cancelAnimationFrame(id);
+	document.onmousedown = null;
+	}
+}
+
 
 function animate() {
-    requestAnimationFrame( animate );
+    id = requestAnimationFrame( animate );
     collisionCheck();
 	targeting();
+	victory();
     renderer.render( scene, camera );
 }
