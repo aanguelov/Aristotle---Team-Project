@@ -153,7 +153,7 @@ function init() {
     crosshair.position.copy( camera.position );
     crosshair.rotation.copy( camera.rotation );
     crosshair.updateMatrix();
-    crosshair.translateZ( - 1 );
+    crosshair.translateZ( - 2 );
 
     scene.add(crosshair);
 
@@ -365,6 +365,8 @@ function CollisionCheck() {
         controls.getObject().translateX( velocity.x * delta );
         controls.getObject().translateY( velocity.y * delta );
         controls.getObject().translateZ( velocity.z * delta );
+        console.log(controls.getObject().position.y - circleControls.getObject().position.y);
+        //console.log(circleControls.getObject().position);
         circleControls.getObject().translateX( velocity.x * delta );
         circleControls.getObject().translateY( velocity.y * delta );
         circleControls.getObject().translateZ( velocity.z * delta );
