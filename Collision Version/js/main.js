@@ -186,12 +186,6 @@ function init() {
                 if ( canJump === true ) velocity.y += 350;
                 canJump = false;
                 break;
-				
-			case 17: // Ctrl  RocketJump
-            case 13: // Enter
-                if (canJump === true) velocity.y += 1000;
-                canJump = false;
-                break;
 
             case 16: // shift
                 speed = 60;
@@ -321,7 +315,7 @@ function collisionCheck() {
         {
             raycaster.set(controls.getObject().position,controls.getHorizontalDirection(sideRays[i].clone()));
             var collisions = raycaster.intersectObjects(objects);
-            if(collisions.length > 0 && collisions[0].distance <= 10)
+            if(collisions.length > 0 && collisions[0].distance <= 5)
             {
                 if (i === 0 && moveForward) {
                     blockedForward = true;
@@ -348,7 +342,7 @@ function collisionCheck() {
         //top collision
         raycaster.set(controls.getObject().position,topRay);
         collisions = raycaster.intersectObjects(objects);
-        if(collisions.length > 0 && collisions[0].distance <= 5) {
+        if(collisions.length > 0 && collisions[0].distance <= 10) {
 
             velocity.y = Math.min(0, velocity.y);
             canJump = true;
