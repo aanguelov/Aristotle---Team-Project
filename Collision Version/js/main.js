@@ -1,7 +1,7 @@
 
 var camera, scene, renderer;
 var geometry, material, mesh;
-var controls;
+var controls, circleControls;
 var objects = [];
 var prev;
 var raycaster;
@@ -23,12 +23,14 @@ if ( havePointerLock ) {
 
             controlsEnabled = true;
             controls.enabled = true;
+            circleControls.enabled = true;
 
             blocker.style.display = 'none';
 
         } else {
 
             controls.enabled = false;
+            circleControls.enabled = false;
 
             blocker.style.display = '-webkit-box';
             blocker.style.display = '-moz-box';
@@ -142,6 +144,21 @@ function init() {
 
     controls = new THREE.PointerLockControls( camera);
     scene.add( controls.getObject() );
+
+    // crosshair
+    var circleGeometry = new THREE.CircleGeometry(0.05, 32);
+    //Load Circle pic:
+    var crosshair = new THREE.Mesh(circleGeometry, new THREE.MeshBasicMaterial( {transparent: true, opacity: 0.5, map:THREE.ImageUtils.loadTexture('resources/target.png')}));
+
+    crosshair.position.copy( camera.position );
+    crosshair.rotation.copy( camera.rotation );
+    crosshair.updateMatrix();
+    crosshair.translateZ( - 1 );
+
+    scene.add(crosshair);
+
+    circleControls = new THREE.CircleControls(crosshair);
+    scene.add(circleControls.getObject());
 
     var onKeyDown = function ( event ) {
 
@@ -316,6 +333,7 @@ function CollisionCheck() {
 
         //bot collision
         raycaster.set(controls.getObject().position,botRay);
+        raycaster.set(circleControls.getObject().position,botRay);
         collisions = raycaster.intersectObjects(objects);
         if(collisions.length > 0) {
 
@@ -325,6 +343,7 @@ function CollisionCheck() {
 
         //top collision
         raycaster.set(controls.getObject().position,topRay);
+        raycaster.set(circleControls.getObject().position,topRay);
         collisions = raycaster.intersectObjects(objects);
         if(collisions.length > 0 && collisions[0].distance <= 5) {
 
@@ -346,11 +365,15 @@ function CollisionCheck() {
         controls.getObject().translateX( velocity.x * delta );
         controls.getObject().translateY( velocity.y * delta );
         controls.getObject().translateZ( velocity.z * delta );
+        circleControls.getObject().translateX( velocity.x * delta );
+        circleControls.getObject().translateY( velocity.y * delta );
+        circleControls.getObject().translateZ( velocity.z * delta );
 
         // ground check
         if ( controls.getObject().position.y < 10 ) {
             velocity.y = 0;
             controls.getObject().position.y = 10;
+            circleControls.getObject().position.y = 10;
             canJump = true;
         }
 
