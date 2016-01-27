@@ -272,6 +272,18 @@ function init() {
 
     window.addEventListener( 'resize', onWindowResize, false );
 
+    document.onmousedown = shoot;
+
+}
+
+function shoot() {
+    objects.forEach(function(box){
+       if (box.isTargeted) {
+           scene.remove(box);
+           objects.splice(objects.indexOf(box), 1);
+       } 
+    });
+
 }
 
 function onWindowResize() {
@@ -388,17 +400,20 @@ function targeting() {
         {
             if(target){
                 target.material.color.setHex(target.currentHex);
+                target.isTargeted = false;
             }
 
             target = collisions[0].object;
             target.currentHex = target.material.color.getHex();
             target.material.color.setHex(0xff0000);
+            target.isTargeted = true;
         }
     }
     else{
         if(target)
         {
             target.material.color.setHex(target.currentHex);
+            target.isTargeted = false;
         }
 
         target = null;
