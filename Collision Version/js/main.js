@@ -192,7 +192,12 @@ function init() {
                 if ( canJump === true ) velocity.y += 350;
                 canJump = false;
                 break;
-
+				
+			case 13: // Enter   //Rocket Jump!
+                if (canJump === true) velocity.y += 1000;
+                canJump = false;
+                break;
+				
             case 16: // shift
                 speed = 60;
                 break;
